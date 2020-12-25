@@ -20,11 +20,12 @@
 </template>
 
 <script>
+import { ref, watch } from "vue";
 let id = 1000;
 export default {
   name: "Config",
   setup() {
-    const data = [
+    const json = [
       {
         id: 1,
         label: "一级 1",
@@ -74,27 +75,30 @@ export default {
         ],
       },
     ];
-    return {
-      data: JSON.parse(JSON.stringify(data)),
-    };
-  },
-  methods: {
-    append(data) {
-      const newChild = { id: id++, label: "testtest", children: [] };
+    const treeData = ref(JSON.parse(JSON.stringify(json)));
+    watch(treeData, () => {
+      console.log("change", treeData);
+    });
+    function append(data) {
+      const newChild = { id: id++, label: "test", children: [] };
       if (!data.children) {
         data.children = [];
       }
       data.children.push(newChild);
-      this.data = [...this.data];
-    },
-
-    remove(node, data) {
+      treeData.value = JSON.parse(JSON.stringify(treeData.value));
+    }
+    function remove(node, data) {
       const parent = node.parent;
       const children = parent.data.children || parent.data;
       const index = children.findIndex((d) => d.id === data.id);
       children.splice(index, 1);
-      this.data = [...this.data];
-    },
+      treeData.value = JSON.parse(JSON.stringify(treeData.value));
+    }
+    return {
+      data: treeData,
+      append,
+      remove,
+    };
   },
 };
 </script>
